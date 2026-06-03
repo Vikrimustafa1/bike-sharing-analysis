@@ -63,9 +63,13 @@ with st.sidebar:
     year_options = {"Semua Tahun": None, "2011": "2011", "2012": "2012"}
     selected_year = st.selectbox("Tahun:", list(year_options.keys()))
 
-    # Filter Musim
-    season_options = ["Semua Musim", "Spring", "Summer", "Fall", "Winter"]
-    selected_season = st.selectbox("Musim:", season_options)
+    # Filter Musim (multiselect agar heatmap & clustering bisa tampil)
+    all_seasons = ["Spring", "Summer", "Fall", "Winter"]
+    selected_season = st.multiselect(
+        "Musim:",
+        options=all_seasons,
+        default=all_seasons,
+    )
 
     # Filter Cuaca
     weather_options = ["Semua Cuaca", "Clear/Partly Cloudy", "Mist/Cloudy", "Light Rain/Snow"]
@@ -87,9 +91,9 @@ if year_options[selected_year]:
     filtered_day  = filtered_day[filtered_day["yr_label"]  == year_options[selected_year]]
     filtered_hour = filtered_hour[filtered_hour["yr_label"] == year_options[selected_year]]
 
-if selected_season != "Semua Musim":
-    filtered_day  = filtered_day[filtered_day["season_label"]  == selected_season]
-    filtered_hour = filtered_hour[filtered_hour["season_label"] == selected_season]
+if selected_season and len(selected_season) < 4:
+    filtered_day  = filtered_day[filtered_day["season_label"].isin(selected_season)]
+    filtered_hour = filtered_hour[filtered_hour["season_label"].isin(selected_season)]
 
 if selected_weather != "Semua Cuaca":
     filtered_day  = filtered_day[filtered_day["weather_label"]  == selected_weather]
@@ -218,14 +222,13 @@ with tab1:
 
     # ── Heatmap Musim × Cuaca ────────────────────────────────────────────────
     st.markdown("**Heatmap: Rata-rata Penyewaan per Kombinasi Musim × Cuaca**")
-    if not filtered_day.empty and filtered_day["season_label"].nunique() > 1:
+    if not filtered_day.empty:
         pivot = (
             filtered_day.groupby(["season_label", "weather_label"])["cnt"]
             .mean()
             .unstack(fill_value=0)
             .reindex(index=[s for s in season_order if s in filtered_day["season_label"].unique()],
-                     columns=[w for w in weather_order if w in filtered_day.columns or
-                               w in filtered_day["weather_label"].unique()])
+                     columns=[w for w in weather_order if w in filtered_day["weather_label"].unique()])
         )
         fig_hm, ax_hm = plt.subplots(figsize=(9, 3.5))
         sns.heatmap(pivot, annot=True, fmt=".0f", cmap="YlOrRd",
@@ -237,8 +240,6 @@ with tab1:
         plt.tight_layout()
         st.pyplot(fig_hm)
         plt.close()
-    else:
-        st.info("Pilih lebih dari satu musim untuk menampilkan heatmap.")
 
     st.markdown(
         '<div class="insight-box">'
@@ -515,7 +516,7 @@ with tab4:
 
         # ── Komposisi musim per klaster ───────────────────────────────────────
         st.markdown("**Komposisi Musim per Klaster Performa**")
-        if fd["season_label"].nunique() > 1:
+        if not fd.empty:
             pivot_cl = pd.crosstab(fd["perf_cluster"], fd["season_label"]).reindex(lbls_f).fillna(0)
             season_c = {"Fall": "#E65100", "Spring": "#43A047", "Summer": "#FB8C00", "Winter": "#1E88E5"}
             fig9, ax9 = plt.subplots(figsize=(9, 4))
@@ -536,8 +537,6 @@ with tab4:
             plt.tight_layout()
             st.pyplot(fig9)
             plt.close()
-        else:
-            st.info("Pilih lebih dari satu musim untuk melihat komposisi musim per klaster.")
     else:
         st.warning("Data tidak cukup untuk clustering. Coba perluas filter.")
 
