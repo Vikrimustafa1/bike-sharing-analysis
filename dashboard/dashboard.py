@@ -52,7 +52,7 @@ day_df, hour_df = load_data()
 
 # ─── Sidebar ────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.image("https://img.icons8.com/color/96/000000/bicycle.png", width=80)
+    st.markdown("<div style='font-size:4rem; text-align:center;'>🚲</div>", unsafe_allow_html=True)
     st.markdown("## 🚲 Bike Sharing")
     st.markdown("**Proyek Analisis Data**\nMuhammad Vikri Mustafa")
     st.markdown("---")
@@ -117,6 +117,15 @@ total_casual = filtered_day["casual"].sum()
 total_reg    = filtered_day["registered"].sum()
 peak_day_val = filtered_day["cnt"].max()
 
+def fmt_metric(val):
+    """Format angka metric; tampilkan '-' jika NaN atau data kosong."""
+    try:
+        if pd.isna(val):
+            return "-"
+        return f"{val:,.0f}"
+    except (TypeError, ValueError):
+        return "-"
+
 def metric_html(value, label):
     return f"""
     <div class="metric-card">
@@ -124,11 +133,11 @@ def metric_html(value, label):
         <div class="metric-lbl">{label}</div>
     </div>"""
 
-c1.markdown(metric_html(f"{total_rent:,.0f}", "Total Penyewaan"), unsafe_allow_html=True)
-c2.markdown(metric_html(f"{avg_daily:,.0f}", "Rata-rata Harian"), unsafe_allow_html=True)
-c3.markdown(metric_html(f"{total_casual:,.0f}", "Pengguna Kasual"), unsafe_allow_html=True)
-c4.markdown(metric_html(f"{total_reg:,.0f}", "Pengguna Terdaftar"), unsafe_allow_html=True)
-c5.markdown(metric_html(f"{peak_day_val:,.0f}", "Penyewaan Tertinggi/Hari"), unsafe_allow_html=True)
+c1.markdown(metric_html(fmt_metric(total_rent),   "Total Penyewaan"), unsafe_allow_html=True)
+c2.markdown(metric_html(fmt_metric(avg_daily),    "Rata-rata Harian"), unsafe_allow_html=True)
+c3.markdown(metric_html(fmt_metric(total_casual), "Pengguna Kasual"), unsafe_allow_html=True)
+c4.markdown(metric_html(fmt_metric(total_reg),    "Pengguna Terdaftar"), unsafe_allow_html=True)
+c5.markdown(metric_html(fmt_metric(peak_day_val), "Penyewaan Tertinggi/Hari"), unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -478,7 +487,8 @@ with tab4:
         bins_f  = [0, q1f, q2f, q3f, filtered_day["cnt"].max() + 1]
         lbls_f  = ["Low", "Medium", "High", "Very High"]
         fd = filtered_day.copy()
-        fd["perf_cluster"] = pd.cut(fd["cnt"], bins=bins_f, labels=lbls_f, right=True)
+        fd["perf_cluster"] = pd.cut(fd["cnt"], bins=bins_f, labels=lbls_f, right=True,
+                                    duplicates="drop")
 
         col_cl1, col_cl2 = st.columns(2)
 
