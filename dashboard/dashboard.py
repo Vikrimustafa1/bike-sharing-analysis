@@ -60,7 +60,7 @@ with st.sidebar:
     st.markdown("### 🔎 Filter Data")
 
     # Filter Tahun
-    year_options = {"Semua Tahun": None, "2011": "2011", "2012": "2012"}
+    year_options = {"Semua Tahun": None, "2011": 2011, "2012": 2012}  # int, bukan string
     selected_year = st.selectbox("Tahun:", list(year_options.keys()))
 
     # Filter Musim (multiselect agar heatmap & clustering bisa tampil)
