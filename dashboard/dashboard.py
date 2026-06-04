@@ -254,8 +254,10 @@ with tab1:
         '<div class="insight-box">'
         "💡 <strong>Insight:</strong> Musim Gugur (<em>Fall</em>) menghasilkan rata-rata penyewaan "
         "tertinggi (~5.644/hari), 116% lebih tinggi dari Spring. Cuaca cerah meningkatkan "
-        "penyewaan hingga 170% dibandingkan kondisi hujan/salju ringan. Suhu berkorelasi "
-        "positif kuat dengan jumlah penyewaan (r ≈ 0.63)."
+        "penyewaan hingga 170% dibandingkan kondisi hujan/salju ringan. "
+        "<strong>Kombinasi musim × cuaca terbaik adalah <em>Fall × Clear/Partly Cloudy</em> "
+        "dengan rata-rata 5.878 penyewaan/hari</strong>, diikuti Summer × Clear (5.549/hari) "
+        "dan Fall × Mist/Cloudy (5.223/hari). Suhu berkorelasi positif kuat dengan jumlah penyewaan (r ≈ 0.63)."
         "</div>",
         unsafe_allow_html=True,
     )
