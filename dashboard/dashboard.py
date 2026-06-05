@@ -10,6 +10,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+import matplotlib.patches as mpatches
+from matplotlib.patches import Patch
 import seaborn as sns
 import os
 
@@ -87,7 +89,7 @@ with st.sidebar:
 filtered_day  = day_df.copy()
 filtered_hour = hour_df.copy()
 
-if year_options[selected_year]:
+if year_options[selected_year] is not None:
     filtered_day  = filtered_day[filtered_day["yr_label"]  == year_options[selected_year]]
     filtered_hour = filtered_hour[filtered_hour["yr_label"] == year_options[selected_year]]
 
@@ -394,7 +396,7 @@ with tab3:
         st.markdown("**Tren Bulanan per Tahun**")
         month_names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
         fig5, ax5 = plt.subplots(figsize=(7, 4.2))
-        colors_yr = {"2011": "#1E88E5", "2012": "#E53935"}
+        colors_yr = {2011: "#1E88E5", 2012: "#E53935"}   # yr_label di CSV bertipe int
         for yr in sorted(filtered_day["yr_label"].unique()):
             data = filtered_day[filtered_day["yr_label"] == yr].groupby("mnth")["cnt"].mean()
             ax5.plot(data.index, data.values, marker="o", label=f"Tahun {yr}",
@@ -426,7 +428,7 @@ with tab3:
         for bar, val in zip(bars6, weekday_avg.values):
             ax6.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 30,
                      f"{val:,.0f}", ha="center", va="bottom", fontsize=8, fontweight="bold")
-        from matplotlib.patches import Patch
+        from matplotlib.patches import Patch  # sudah di-import di top-level
         ax6.legend(handles=[Patch(color="#1565C0", label="Hari Kerja"),
                              Patch(color="#E53935", label="Akhir Pekan")],
                    fontsize=8)
